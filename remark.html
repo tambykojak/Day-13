@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Day 13</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+
+      img {
+          max-width: 100%;
+          width: 100%;
+      }
+
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Day 13
+### Computer Science Fundamentals
+
+---
+
+# Last Class
+
+1. Rotations
+2. Calculated Height of Tree
+3.
+
+--
+
+count: false
+
+# Today
+
+1. Red-black Trees (Finally)
+2. Graphs
+
+---
+
+# Red-black Tree Properties
+
+<i>When discussing Red-Black Trees, the NULL nodes which terminate the tree are considered to be the leaves and are coloured black.</i>
+
+--
+
+count: false
+
+1. All nodes are either red or black.
+2. The root and all leaves are black.
+3. All red nodes must have black children nodes.
+4. All paths from a node to a leaf contain the same number of black nodes. <i>Also called the black height</i>
+
+![Right-aligned image](https://www.cs.auckland.ac.nz/software/AlgAnim/fig/rb_tree1a.gif)
+
+---
+
+# Inserting into a Red-Black Tree
+
+The overall strategy of inserting into a Red-Black tree is to
+1. Insert the node just like a normal BST. All new nodes start out as red.
+2. If any of the four principles of the Red-Black Tree are broken, correct them by recoloring and rotating certain nodes.
+
+---
+
+# Possible scenarios
+After inserting our new Red node into our Red-Black Tree (just like we would a normal BST), one of three scenarios could happen.
+
+1. New node is the root.
+2. New node has a red uncle.
+3. New node has a black uncle.
+
+---
+
+# Defining our node
+
+```python
+class RBNode(Node):
+  RED = True
+  BLACK = False
+
+  def __init__(self, number):
+    self.left = None
+    self.right = None
+    self.parent = None
+    self.color = self.RED
+    self.set_number(number)
+
+  def set_number(self, number):
+      self.number = number
+      self.fix_value()
+
+  def set_color(self, color):
+      self.color = color
+      self.fix_value()
+
+  def fix_value(self):
+      if self.color == self.RED:
+          appendString = 'R'
+      else:
+          appendString = 'B'
+
+      self.value = str(self.number) + appendString
+```
+---
+
+```python
+class RBNode(Node):
+  # ... Other Methods ...
+
+  def right_rotate(self):
+      ...
+
+  def left_rotate(self):
+      ...
+
+  def is_right_node(self):
+      ...
+
+  def is_left_node(self):
+      ...
+
+  def uncle(self):
+      p = self.parent
+
+      if p is None: return None
+
+      g = self.parent.parent
+
+      if g is None: return None
+
+      if p.is_left_node(): u = g.right
+      else: u = g.left
+      return u
+
+  def toggle_color(self):
+      self.set_color(not self.color)
+      self.fix_value()
+```
+---
+```python
+class RedBlackTree:
+    def __init__(self):
+        self.root = None
+
+    def add(self, value):
+        new_node = RBNode(value)
+
+        if self.root == None:
+            self.root = new_node
+            self.fix_violations(new_node)
+            return
+
+        self.root.add(new_node)
+        if new_node.parent.color == RBNode.RED:
+            self.fix_violations(new_node)
+
+    def right_rotate(self, node):
+        new_root = node.right_rotate()
+        if node == self.root:
+            self.root = new_root
+
+    def left_rotate(self, node):
+        new_root = node.left_rotate()
+        if node == self.root:
+            self.root = new_root
+
+    def fix_violations(self, violating_node):
+        # Magic goes here
+```
+---
+```python
+def fix_violations(self, violating_node):
+    print("Attempting to fix " + str(violating_node))
+    if violating_node == self.root:
+        print(str(violating_node) + " is the root. Setting to black.")
+        violating_node.set_color(RBNode.BLACK)
+        return
+
+    uncle = violating_node.uncle()
+    parent = violating_node.parent
+    if parent is None: return
+    grandparent = parent.parent
+```
+---
+class: center, middle
+
+# Any Questions?
+##### <i>Cause we're about to move onto Graphs :)</i>
+
+---
+
+# What is a Graph?
+
+* A graph is a <strong>set</strong> of nodes and a <strong>set</strong> of edges.
+
+![image](http://www3.cs.stonybrook.edu/~algorith/files/graph-data-structures-L.gif)
+
+* A mathematical model used in Graph Theory.
+
+---
+
+![image](https://i.stack.imgur.com/w3LhO.png)
+
+---
+# Why Graphs?
+
+Graphs represent certain sets of data in the most elegant of ways.
+
+* Social Networks
+* Networks
+* Anything where everything could potentially connect to everything...
+
+---
+
+# Graph Databases
+
+There are an entire class of databases that revolve around Graphs.
+
+Facebook API uses something called GraphQL.
+
+---
+
+# Edges & Arcs
+
+* Edges can be represented as ordered pairs or unordered pairs.
+* (A, B) is an example of an ordered pair. These are called Arcs.
+* {A, B} is an example of an unordered pair and can also be represented like {B, A}. These are called edges.
+
+---
+
+# Different types of Graphs
+
+* Directed Graph - A graph that is represented through nodes + arcs.
+* Undirected Graph - A graph that is represented through nodes + edges.
+
+---
+
+# Directed Graph
+
+![image](https://qph.ec.quoracdn.net/main-qimg-f9bd9c6610f86746469cb4ff6ccfec9f)
+
+---
+
+# Undirected Graph
+
+![image](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Undirected_graph.svg/1280px-Undirected_graph.svg.png)
+
+---
+class: center, middle
+
+# Does facebook use a directed graph or undirected graph? What about Twitter?
+
+---
+
+# Weighted vs Unweighted
+
+* A weighted graph is a graph where the arcs or edges have values to represent the "difficulty" of traversing them.
+* An unweignted graph is a graph where the weight of all arcs and edges are equal or nonexistant.
+
+---
+
+# Weighted Graph
+
+![image](https://process.filestackapi.com/cache=expiry:max/NFPJSZO5SyoWO3VBMSdN)
+
+---
+
+# Unweighted Graph
+
+![image](http://users.csc.calpoly.edu/~jdalbey/103/graphics/graph1.jpg)
+
+---
+
+# Creating our own graph.
+
+```python
+class GraphNode:
+  def __init__(self, value):
+    self.value = value
+    self.neighbors = []
+```
+
+```python
+class MyGraph:
+  def __init__(self):
+    self.entry = None
+```
+---
+
+# Traversing a graph
+
+
+
+</textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script> var slideshow = remark.create(); </script>
+</body>
+</html>
